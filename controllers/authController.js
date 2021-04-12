@@ -7,7 +7,7 @@ const register = async (req, res) => {
 
   //check if all fields are present
   if (!email || !username || !password) {
-    return  res.status(400).send("please provide all fields.");
+    return res.status(400).send("please provide all fields.");
   }
 
   //check if username/email is already in database
@@ -51,7 +51,28 @@ const login = async (req, res) => {
     res.status(200).json({ token });
 };
 
+const verifyToken = (req, res, next) => {
+    const token = req.headers;
+
+    if (!token) {
+        return res.status(401).json({ message: "Not Authorized" });
+    }
+
+    token = token.split(" ")[1];
+      
+    try {
+        let user = jwt.verify(token, "12345679");
+        console.log(user)
+        return next();
+    } catch (error) {
+        res.status(401).json({ message: "invalid token." });
+    }
+
+    next(); 
+}
+
 module.exports = {
   register,
   login,
+  verifyToken,
 };
